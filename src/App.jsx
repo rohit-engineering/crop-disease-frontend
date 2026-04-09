@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState ,useCallback } from "react";
 import MobileView from "./components/MobileView";
 import DesktopView from "./components/DesktopView";
 
@@ -64,19 +64,19 @@ function App() {
     }
   };
 
-  const translateAllContent = async () => {
-    let newTranslations = {};
+const translateAllContent = useCallback(async () => {
+  let newTranslations = {};
 
-    for (let key in BASE_TEXT) {
-      newTranslations[key] = await translateText(BASE_TEXT[key], language);
-    }
+  for (let key in BASE_TEXT) {
+    newTranslations[key] = await translateText(BASE_TEXT[key], language);
+  }
 
-    setTranslatedText(newTranslations);
-  };
+  setTranslatedText(newTranslations);
+}, [language]);
 
   useEffect(() => {
-    translateAllContent();
-  }, [language]);
+  translateAllContent();
+}, [translateAllContent]);
 
   const t = language === "en" ? BASE_TEXT : translatedText;
 
