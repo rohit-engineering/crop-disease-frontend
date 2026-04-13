@@ -1,27 +1,30 @@
-import { useEffect, useState ,useCallback } from "react";
+// App.jsx
+
+import "./styles/app.css";
+import { useEffect, useState, useCallback } from "react";
 import MobileView from "./components/MobileView";
 import DesktopView from "./components/DesktopView";
 
 const BASE_TEXT = {
-    title: "Crop Doctor AI",
-    subtitle: "Upload leaf photo to check disease",
-    upload: "Upload Leaf Photo",
-    predict: "Check Disease",
-    analyzing: "Checking...",
-    selectLeaf: "Please select a leaf image",
-    resultTitle: "Result",
-    noResult: "Upload photo to get result",
-    disease: "Disease",
-    confidence: "Confidence",
-    warning: "Warning",
-    solution: "Solution",
-    symptoms: "Symptoms",
-    organic: "Organic Treatment",
-    chemical: "Chemical Treatment",
-    prevention: "Prevention",
-    tip: "Extra Tip",
-    source: "Solution Source",
-  };
+  title: "Crop Doctor AI",
+  subtitle: "AI Powered Crop Disease Detection",
+  upload: "Upload Leaf Photo",
+  predict: "Check Disease",
+  analyzing: "Scanning Crop...",
+  selectLeaf: "Please select a leaf image",
+  resultTitle: "Detection Result",
+  noResult: "Upload image to view prediction",
+  disease: "Disease",
+  confidence: "Confidence",
+  warning: "Warning",
+  solution: "Solution",
+  symptoms: "Symptoms",
+  organic: "Organic Treatment",
+  chemical: "Chemical Treatment",
+  prevention: "Prevention",
+  tip: "Extra Tip",
+  source: "Solution Source",
+};
 
 function App() {
   const [image, setImage] = useState(null);
@@ -33,7 +36,6 @@ function App() {
   const [translatedText, setTranslatedText] = useState({});
 
   const BACKEND_URL = "https://crop-disease-detection-hyh4.onrender.com/predict";
-
 
   const LANGUAGES = [
     { code: "en", name: "English" },
@@ -48,36 +50,35 @@ function App() {
   ];
 
   const translateText = useCallback(async (text, targetLang) => {
-  if (targetLang === "en") return text;
+    if (targetLang === "en") return text;
 
-  try {
-    const res = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-        text
-      )}&langpair=en|${targetLang}`
-    );
+    try {
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+          text
+        )}&langpair=en|${targetLang}`
+      );
 
-    const data = await res.json();
-    return data.responseData.translatedText;
-  } catch (error) {
-    console.error("Translation error:", error);
-    return text;
-  }
-}, []);
+      const data = await res.json();
+      return data.responseData.translatedText;
+    } catch {
+      return text;
+    }
+  }, []);
 
-const translateAllContent = useCallback(async () => {
-  let newTranslations = {};
+  const translateAllContent = useCallback(async () => {
+    let newTranslations = {};
 
-  for (let key in BASE_TEXT) {
-    newTranslations[key] = await translateText(BASE_TEXT[key], language);
-  }
+    for (let key in BASE_TEXT) {
+      newTranslations[key] = await translateText(BASE_TEXT[key], language);
+    }
 
-  setTranslatedText(newTranslations);
-}, [language, translateText]);
+    setTranslatedText(newTranslations);
+  }, [language, translateText]);
 
   useEffect(() => {
-  translateAllContent();
-}, [translateAllContent]);
+    translateAllContent();
+  }, [translateAllContent]);
 
   const t = language === "en" ? BASE_TEXT : translatedText;
 
@@ -96,43 +97,34 @@ const translateAllContent = useCallback(async () => {
   };
 
   const handleSubmit = async () => {
-  if (!image) return alert(t.selectLeaf || BASE_TEXT.selectLeaf);
+    if (!image) return alert(t.selectLeaf || BASE_TEXT.selectLeaf);
 
-  const formData = new FormData();
-  formData.append("file", image);
-  formData.append("language", language);
+    const formData = new FormData();
+    formData.append("file", image);
+    formData.append("language", language);
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      body: formData,
-    });
+      const res = await fetch(BACKEND_URL, {
+        method: "POST",
+        body: formData,
+      });
 
-    if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`Server Error ${res.status}: ${txt}`);
-     }
+      const data = await res.json();
 
-    const data = await res.json();
+      if (data.error) {
+        alert("Upload only diseased crop leaf.");
+        return;
+      }
 
-    // 🔥 HANDLE ERROR FROM BACKEND
-    if (data.error) {
-      setResult(null);
-      alert("❌ Please upload only diseased leaf image");
-      return;
+      setResult(data);
+    } catch {
+      alert("Backend not reachable.");
+    } finally {
+      setLoading(false);
     }
-
-    setResult(data);
-
-  } catch (err) {
-    alert("Backend not reachable. Check FastAPI server.");
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const formatConfidence = (val) => {
     if (!val) return "N/A";
@@ -146,9 +138,16 @@ const translateAllContent = useCallback(async () => {
     return "danger";
   };
 
-  const solution = result?.solution;
+  const solution = result?.solution || {
+    cause: "",
+    symptoms: [],
+    organic_treatment: [],
+    chemical_treatment: [],
+    prevention: [],
+    extra_tip: "",
+    warning: "",
+  };
 
-  // 🔥 RESPONSIVE DETECTOR
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
 
   useEffect(() => {
@@ -176,14 +175,10 @@ const translateAllContent = useCallback(async () => {
     getBadgeColor,
   };
 
-  return (
-    <>
-      {isMobile ? (
-        <MobileView {...commonProps} />
-      ) : (
-        <DesktopView {...commonProps} />
-      )}
-    </>
+  return isMobile ? (
+    <MobileView {...commonProps} />
+  ) : (
+    <DesktopView {...commonProps} />
   );
 }
 

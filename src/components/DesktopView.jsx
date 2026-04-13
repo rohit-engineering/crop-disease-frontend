@@ -1,3 +1,20 @@
+// components/DesktopView.jsx
+// FINAL PREMIUM DESKTOP FILE
+
+import { motion } from "framer-motion";
+import {
+  FaLeaf,
+  FaRobot,
+  FaUpload,
+  FaSearch,
+  FaGlobeAsia,
+  FaCheckCircle,
+  FaShieldAlt,
+  FaFlask,
+  FaSeedling,
+  FaBug,
+} from "react-icons/fa";
+
 export default function DesktopView({
   preview,
   result,
@@ -11,30 +28,42 @@ export default function DesktopView({
   handleImageChange,
   handleSubmit,
   formatConfidence,
-  getBadgeColor,
 }) {
+  const confidenceWidth = result?.confidence
+    ? `${(result.confidence * 100).toFixed(0)}%`
+    : "0%";
+
   return (
-    <div className="desktop-bg">
-      <div className="container py-5">
-        <div className="row g-4">
-          {/* LEFT PANEL */}
-          <div className="col-lg-5">
-            <div className="desktop-header-card shadow-sm">
-              <h2 className="fw-bold text-white mb-1">
-                🌿 {t.title || BASE_TEXT.title}
-              </h2>
-              <p className="text-light opacity-75 mb-0">
-                {t.subtitle || BASE_TEXT.subtitle}
+    <div className="desktop-pro-bg">
+
+      {/* PREMIUM HEADER */}
+      <div className="desk-navbar premium-header">
+
+        <div className="container-fluid px-5">
+
+          <div className="row align-items-center">
+
+            <div className="col-lg-8">
+              <h1 className="desk-logo premium-title">
+                <FaLeaf className="me-2" />
+                {t.title || BASE_TEXT.title}
+              </h1>
+
+              <p className="premium-tagline">
+                <FaRobot className="me-2" />
+                Smart AI Powered Crop Disease Detection
               </p>
             </div>
 
-            <div className="card ai-card shadow-sm p-4 mt-4">
-              <label className="fw-bold text-muted mb-2">
-                🌍 Select Language
+            <div className="col-lg-4 text-end">
+
+              <label className="premium-label">
+                <FaGlobeAsia className="me-2" />
+                Select Language
               </label>
 
               <select
-                className="form-select form-select-lg village-select"
+                className="premium-select"
                 value={language}
                 onChange={handleLanguageChange}
               >
@@ -45,188 +74,252 @@ export default function DesktopView({
                 ))}
               </select>
 
-              <hr />
+            </div>
 
-              <label className="fw-bold text-muted mb-2">
-                📷 Upload Leaf Photo
-              </label>
+          </div>
+        </div>
+      </div>
 
-              <label className="btn btn-warning btn-lg w-100 fw-bold village-btn">
-                📸 {t.upload || BASE_TEXT.upload}
+      {/* BODY */}
+      <div className="container-fluid px-5 py-4">
+
+        <div className="row g-4">
+
+          {/* LEFT SIDE */}
+          <div className="col-lg-4">
+
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="desk-box sticky-top"
+              style={{ top: "25px" }}
+            >
+
+              <h3 className="desk-section-title">
+                <FaUpload className="me-2" />
+                Upload Crop Leaf
+              </h3>
+
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/628/628324.png"
+                alt="leaf"
+                className="desk-leaf-icon"
+              />
+
+              <label className="desk-upload-btn">
+                <FaUpload className="me-2" />
+                Upload Leaf Photo
+
                 <input
+                  hidden
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  hidden
                 />
               </label>
 
-              <p className="small text-muted mt-3 mb-0">
-                Better result ke liye leaf ka clear photo lo, blur nahi hona
-                chahiye.
-              </p>
-
               {preview && (
-                <div className="mt-4 preview-card p-2">
-                  <img src={preview} alt="preview" className="preview-img" />
-                </div>
+                <img
+                  src={preview}
+                  alt="preview"
+                  className="desk-preview mt-4"
+                />
               )}
 
               <button
-                className="btn btn-success btn-lg w-100 fw-bold mt-4 predict-btn"
+                className="desk-scan-btn mt-4"
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading
-                  ? `⏳ ${t.analyzing || BASE_TEXT.analyzing}`
-                  : `🔍 ${t.predict || BASE_TEXT.predict}`}
+                {loading ? (
+                  <>
+                    <span className="loader me-2"></span>
+                    Scanning...
+                  </>
+                ) : (
+                  <>
+                    <FaSearch className="me-2" />
+                    Check Disease
+                  </>
+                )}
               </button>
-            </div>
+
+              <p className="small text-muted mt-4 mb-0">
+                Best result ke liye clear leaf image upload karein.
+              </p>
+
+            </motion.div>
           </div>
 
-          {/* RIGHT PANEL */}
-          <div className="col-lg-7">
-            <div className="card ai-card shadow-sm p-4 result-card">
-              <h4 className="fw-bold text-success text-center mb-4">
-                ✅ {t.resultTitle || BASE_TEXT.resultTitle}
-              </h4>
+          {/* RIGHT SIDE */}
+          <div className="col-lg-8">
 
-              {!result ? (
-                <div className="empty-result-box">
-                  <img
-                    src="https://cdn-icons-png.flaticon.com/512/2909/2909761.png"
-                    alt="ai"
-                    className="empty-ai-img"
-                  />
-                  <p className="text-muted fw-semibold mt-3">
-                    {t.noResult || BASE_TEXT.noResult}
-                  </p>
+            {!result ? (
+              <div className="desk-box text-center p-5">
+                <h3 className="text-success fw-bold">
+                  <FaCheckCircle className="me-2" />
+                  Detection Result
+                </h3>
+
+                <p className="text-muted mt-4">
+                  Upload crop image to detect disease
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* TOP RESULT */}
+                <div className="row g-4 mb-4">
+
+                  <div className="col-md-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 25 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="desk-box disease-card-big"
+                    >
+                      <h5>
+                        <FaBug className="me-2" />
+                        Disease Found
+                      </h5>
+
+                      <h3 className="mt-3 text-success">
+                        {result.prediction}
+                      </h3>
+                    </motion.div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 25 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="desk-box confidence-big"
+                    >
+                      <h5>Confidence Score</h5>
+
+                      <div className="progress mt-4">
+                        <div
+                          className="progress-bar progress-bar-striped progress-bar-animated"
+                          style={{ width: confidenceWidth }}
+                        >
+                          {formatConfidence(result.confidence)}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
                 </div>
-              ) : (
-                <>
-                  <div className="row g-3 mb-4">
-                    <div className="col-md-6">
-                      <div className="mini-info-card">
-                        <p className="mb-1 text-muted fw-bold">
-                          🌿 {t.disease || BASE_TEXT.disease}
-                        </p>
-                        <h5 className="fw-bold text-success mb-0">
-                          {result.prediction}
-                        </h5>
-                      </div>
-                    </div>
 
-                    <div className="col-md-6">
-                      <div className="mini-info-card">
-                        <p className="mb-1 text-muted fw-bold">
-                          🎯 {t.confidence || BASE_TEXT.confidence}
-                        </p>
-                        <h5 className="fw-bold mb-0">
-                          <span
-                            className={`badge bg-${getBadgeColor(
-                              result.confidence
-                            )} px-3 py-2`}
-                          >
-                            {formatConfidence(result.confidence)}
-                          </span>
-                        </h5>
-                      </div>
-                    </div>
-                  </div>
+                {/* CAUSE */}
+                <motion.div
+                  initial={{ opacity: 0, y: 25 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="desk-box mb-4"
+                >
+                  <h3 className="desk-section-title">
+                    <FaSeedling className="me-2" />
+                    Treatment Guide
+                  </h3>
 
-                  {result.warning && (
-                    <div className="alert alert-warning fw-semibold">
-                      ⚠️ <b>{t.warning || BASE_TEXT.warning}:</b>{" "}
-                      {result.warning}
-                    </div>
+                  {solution?.cause && (
+                    <p className="mt-3 mb-0">
+                      <b>Cause:</b> {solution.cause}
+                    </p>
                   )}
+                </motion.div>
 
-                  <div className="small fw-bold text-muted mb-3">
-                    📌 {t.source || BASE_TEXT.source}:{" "}
-                    <span className="text-dark">{result.solution_source}</span>
+                {/* GRID CARDS */}
+                <div className="row g-4">
+
+                  {/* Symptoms */}
+                  <div className="col-md-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 35 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="desk-box small-box"
+                    >
+                      <h5>Symptoms</h5>
+
+                      <ul>
+                        {solution?.symptoms?.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </motion.div>
                   </div>
 
-                  <div className="solution-box mt-3">
-                    <h5 className="fw-bold text-success mb-3">
-                      🌱 {t.solution || BASE_TEXT.solution}
-                    </h5>
+                  {/* Organic */}
+                  <div className="col-md-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 35 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="desk-box small-box"
+                    >
+                      <h5>
+                        <FaLeaf className="me-2" />
+                        Organic Treatment
+                      </h5>
 
-                    {solution?.message && (
-                      <p className="fw-semibold">{solution.message}</p>
-                    )}
-
-                    {solution?.cause && (
-                      <p className="fw-semibold">
-                        <b>Cause:</b> {solution.cause}
-                      </p>
-                    )}
-
-                    {solution?.symptoms && Array.isArray(solution.symptoms) && (
-                      <div className="mb-3">
-                        <b>🟡 {t.symptoms || BASE_TEXT.symptoms}:</b>
-                        <ul className="mt-2">
-                          {solution.symptoms.map((s, i) => (
-                            <li key={i}>{s}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {solution?.organic_treatment &&
-                      Array.isArray(solution.organic_treatment) && (
-                        <div className="mb-3">
-                          <b>🍃 {t.organic || BASE_TEXT.organic}:</b>
-                          <ul className="mt-2">
-                            {solution.organic_treatment.map((s, i) => (
-                              <li key={i}>{s}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                    {solution?.chemical_treatment &&
-                      Array.isArray(solution.chemical_treatment) && (
-                        <div className="mb-3">
-                          <b>🧪 {t.chemical || BASE_TEXT.chemical}:</b>
-                          <ul className="mt-2">
-                            {solution.chemical_treatment.map((s, i) => (
-                              <li key={i}>{s}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                    {solution?.prevention &&
-                      Array.isArray(solution.prevention) && (
-                        <div className="mb-3">
-                          <b>🛡️ {t.prevention || BASE_TEXT.prevention}:</b>
-                          <ul className="mt-2">
-                            {solution.prevention.map((s, i) => (
-                              <li key={i}>{s}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                    {solution?.extra_tip && (
-                      <div className="alert alert-success fw-semibold">
-                        💡 <b>{t.tip || BASE_TEXT.tip}:</b> {solution.extra_tip}
-                      </div>
-                    )}
-
-                    {solution?.warning && (
-                      <div className="alert alert-danger fw-semibold">
-                        🚨 <b>Safety:</b> {solution.warning}
-                      </div>
-                    )}
+                      <ul>
+                        {solution?.organic_treatment?.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </motion.div>
                   </div>
-                </>
-              )}
-            </div>
+
+                  {/* Chemical */}
+                  <div className="col-md-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 35 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      className="desk-box small-box"
+                    >
+                      <h5>
+                        <FaFlask className="me-2" />
+                        Chemical Treatment
+                      </h5>
+
+                      <ul>
+                        {solution?.chemical_treatment?.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  </div>
+
+                  {/* Prevention */}
+                  <div className="col-md-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 35 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1 }}
+                      className="desk-box small-box"
+                    >
+                      <h5>
+                        <FaShieldAlt className="me-2" />
+                        Prevention
+                      </h5>
+
+                      <ul>
+                        {solution?.prevention?.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  </div>
+
+                </div>
+              </>
+            )}
 
             <div className="text-center mt-4 small text-muted">
-              Smart Farming AI | Designed for Rural Farmers 🌾
+              Made for Farmers 🇮🇳 | Smart Farming Future 🌱
             </div>
+
           </div>
         </div>
       </div>

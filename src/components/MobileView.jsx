@@ -1,3 +1,16 @@
+// components/MobileView.jsx
+// FINAL COMPLETE MOBILE FILE
+
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  FaLeaf,
+  FaCamera,
+  FaUpload,
+  FaCheckCircle,
+  FaArrowLeft,
+} from "react-icons/fa";
+
 export default function MobileView({
   preview,
   result,
@@ -6,45 +19,110 @@ export default function MobileView({
   LANGUAGES,
   t,
   BASE_TEXT,
-  solution,
   handleLanguageChange,
   handleImageChange,
   handleSubmit,
   formatConfidence,
-  getBadgeColor,
 }) {
+  const [showResult, setShowResult] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [typingText, setTypingText] = useState("");
+
+  useEffect(() => {
+    if (!result) {
+      setShowResult(false);
+      setChatMessages([]);
+      setTypingText("");
+      return;
+    }
+
+    setShowResult(true);
+    setChatMessages([]);
+    setTypingText("");
+
+    const data = result.solution || {};
+
+    const messages = [
+      "Disease analyzed successfully ✅",
+      `Cause: ${data.cause || "Crop infection detected."}`,
+      `Symptoms: ${
+        data.symptoms?.length
+          ? data.symptoms.join(", ")
+          : "Leaf damage symptoms found."
+      }`,
+      `Organic Treatment: ${
+        data.organic_treatment?.length
+          ? data.organic_treatment.join(", ")
+          : "Use neem spray weekly."
+      }`,
+      `Chemical Treatment: ${
+        data.chemical_treatment?.length
+          ? data.chemical_treatment.join(", ")
+          : "Use recommended fungicide."
+      }`,
+      `Prevention: ${
+        data.prevention?.length
+          ? data.prevention.join(", ")
+          : "Avoid excess moisture and keep field clean."
+      }`,
+    ];
+
+    let msgIndex = 0;
+
+    const typeMessage = () => {
+      if (msgIndex >= messages.length) return;
+
+      const currentMessage = messages[msgIndex];
+      let charIndex = 0;
+
+      setTypingText("");
+
+      const typer = setInterval(() => {
+        charIndex++;
+
+        setTypingText(currentMessage.slice(0, charIndex));
+
+        if (charIndex >= currentMessage.length) {
+          clearInterval(typer);
+
+          setTimeout(() => {
+            setChatMessages((prev) => [...prev, currentMessage]);
+            setTypingText("");
+            msgIndex++;
+            typeMessage();
+          }, 600);
+        }
+      }, 24);
+    };
+
+    typeMessage();
+  }, [result]);
+
+  const confidenceWidth = result?.confidence
+    ? `${(result.confidence * 100).toFixed(0)}%`
+    : "0%";
+
   return (
-    <div className="app-bg">
-      {/* TOP HEADER */}
-      <div className="mobile-header shadow-sm">
-        <div className="d-flex align-items-center justify-content-between">
-          <div>
-            <h4 className="fw-bold mb-0 text-white">
-              🌿 {t.title || BASE_TEXT.title}
-            </h4>
-            <small className="text-light opacity-75">
-              {t.subtitle || BASE_TEXT.subtitle}
-            </small>
-          </div>
+    <div className="ultra-bg">
 
-          <div className="header-badge">
-            <span className="badge rounded-pill bg-light text-success fw-bold px-3 py-2">
-              AI
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* HEADER */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="ultra-header"
+      >
+        <h3 className="mb-2">
+          <FaLeaf className="me-2" />
+          {t.title || BASE_TEXT.title}
+        </h3>
 
-      {/* MAIN BODY */}
-      <div className="container py-3">
-        {/* Language */}
-        <div className="card ai-card mb-3 p-3">
-          <label className="fw-bold mb-2 text-muted">
-            🌍 Language / भाषा
-          </label>
+        <p className="mb-3">
+          Smart Crop Disease Detection
+        </p>
 
+        {!loading && !result && (
           <select
-            className="form-select form-select-lg village-select"
+            className="ultra-select"
             value={language}
             onChange={handleLanguageChange}
           >
@@ -54,174 +132,190 @@ export default function MobileView({
               </option>
             ))}
           </select>
-        </div>
+        )}
+      </motion.div>
 
-        {/* Upload */}
-        <div className="card ai-card mb-3 p-3">
-          <label className="fw-bold mb-2 text-muted">
-            📷 Upload Leaf Photo
-          </label>
+      {/* START SCREEN */}
+      {!preview && !loading && !result && (
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card"
+        >
+          <h5 className="text-center fw-bold mb-3 text-success">
+            Upload Crop Leaf
+          </h5>
 
-          <label className="btn btn-warning btn-lg w-100 fw-bold village-btn">
-            📸 {t.upload || BASE_TEXT.upload}
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/628/628324.png"
+            alt="leaf"
+            className="leaf-top-img"
+          />
+
+          <label className="ultra-btn mb-3">
+            <FaCamera className="me-2" />
+            Capture Image
+
             <input
+              hidden
               type="file"
               accept="image/*"
+              capture="environment"
               onChange={handleImageChange}
-              hidden
             />
           </label>
 
-          <p className="text-muted small mt-2 mb-0">
-            Tip: Clear photo lo bhai, sunlight mein lena best rahega 🌞
-          </p>
-        </div>
+          <label className="ultra-btn secondary">
+            <FaUpload className="me-2" />
+            Upload Image
 
-        {/* Preview */}
-        {preview && (
-          <div className="card ai-card mb-3 p-2 preview-card">
-            <img src={preview} alt="preview" className="preview-img" />
-          </div>
-        )}
+            <input
+              hidden
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </label>
+        </motion.div>
+      )}
 
-        {/* Predict */}
-        <button
-          className="btn btn-success btn-lg w-100 fw-bold predict-btn"
-          onClick={handleSubmit}
-          disabled={loading}
+      {/* PREVIEW */}
+      {preview && !loading && !result && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-card"
         >
-          {loading
-            ? `⏳ ${t.analyzing || BASE_TEXT.analyzing}`
-            : `🔍 ${t.predict || BASE_TEXT.predict}`}
-        </button>
+          <img
+            src={preview}
+            alt="Crop preview"
+            className="ultra-preview"
+          />
 
-        {/* RESULT */}
-        <div className="card ai-card mt-4 p-3 result-card">
-          <h5 className="fw-bold text-center text-success mb-3">
-            ✅ {t.resultTitle || BASE_TEXT.resultTitle}
+          <button
+            className="scan-btn mt-3"
+            onClick={handleSubmit}
+          >
+            Scan Disease
+          </button>
+        </motion.div>
+      )}
+
+      {/* LOADING */}
+      {loading && (
+        <div className="glass-card text-center">
+          <div className="loader-big mb-4"></div>
+
+          <h5 className="fw-bold text-success">
+            Scanning Your Image...
           </h5>
 
-          {!result ? (
-            <p className="text-center text-muted fw-semibold mb-0">
-              {t.noResult || BASE_TEXT.noResult}
-            </p>
-          ) : (
-            <>
-              <div className="result-row">
-                <span className="fw-bold">
-                  🌿 {t.disease || BASE_TEXT.disease}:
-                </span>
-                <span className="fw-bold text-success">{result.prediction}</span>
+          <p className="typing-title">
+            Detecting disease with AI...
+          </p>
+        </div>
+      )}
+
+      {/* RESULT */}
+      {result && showResult && !loading && (
+        <motion.div
+          initial={{ opacity: 0, y: 35 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card"
+        >
+          <h5 className="text-success text-center fw-bold">
+            <FaCheckCircle className="me-2" />
+            Analysis Complete
+          </h5>
+
+          <p className="text-center small text-muted mb-3">
+            Your crop report is ready 🌱
+          </p>
+
+          {/* Disease */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="result-box disease-card"
+          >
+            <small>Disease Detected</small>
+            <h6 className="disease-text">
+              🌿 {result.prediction}
+            </h6>
+          </motion.div>
+
+          {/* Confidence */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="result-box confidence-card"
+          >
+            <small>AI Confidence Score</small>
+
+            <div className="progress mt-3">
+              <div
+                className="progress-bar progress-bar-striped progress-bar-animated"
+                style={{ width: confidenceWidth }}
+              >
+                {formatConfidence(result.confidence)}
               </div>
+            </div>
+          </motion.div>
 
-              <div className="result-row mt-2">
-                <span className="fw-bold">
-                  🎯 {t.confidence || BASE_TEXT.confidence}:
-                </span>
+          {/* AI Chat */}
+          <div className="solution-box mt-3">
 
-                <span
-                  className={`badge rounded-pill bg-${getBadgeColor(
-                    result.confidence
-                  )} px-3 py-2`}
-                >
-                  {formatConfidence(result.confidence)}
-                </span>
-              </div>
+            <h6 className="fw-bold text-success mb-3">
+              🤖 AI Treatment Assistant
+            </h6>
 
-              {result.warning && (
-                <div className="alert alert-warning mt-3 fw-semibold">
-                  ⚠️ <b>{t.warning || BASE_TEXT.warning}:</b> {result.warning}
+            <div className="chat-thread">
+
+              {chatMessages.map((msg, i) => (
+                <div key={i} className="chat-msg">
+                  <div className="chat-avatar">🤖</div>
+
+                  <div className="chat-bubble">
+                    {msg}
+                  </div>
+                </div>
+              ))}
+
+              {typingText && (
+                <div className="chat-msg">
+                  <div className="chat-avatar">🤖</div>
+
+                  <div className="chat-bubble">
+                    {typingText}
+                    <span className="cursor-blink">|</span>
+                  </div>
                 </div>
               )}
 
-              <div className="small text-muted fw-bold mt-2">
-                📌 {t.source || BASE_TEXT.source}:{" "}
-                <span className="text-dark">{result.solution_source}</span>
-              </div>
+            </div>
+          </div>
 
-              {/* SOLUTION */}
-              <div className="solution-box mt-4">
-                <h6 className="fw-bold text-center mb-3 text-success">
-                  🌱 {t.solution || BASE_TEXT.solution}
-                </h6>
+          {/* Back Button */}
+          <button
+            className="back-btn mt-4"
+            onClick={() => window.location.reload()}
+          >
+            <FaArrowLeft className="me-2" />
+            Check Another Leaf
+          </button>
+        </motion.div>
+      )}
 
-                {solution?.message && (
-                  <p className="fw-semibold mb-2">{solution.message}</p>
-                )}
-
-                {solution?.cause && (
-                  <p className="fw-semibold mb-2">
-                    <b>Cause:</b> {solution.cause}
-                  </p>
-                )}
-
-                {solution?.symptoms && Array.isArray(solution.symptoms) && (
-                  <div className="mb-3">
-                    <b>🟡 {t.symptoms || BASE_TEXT.symptoms}:</b>
-                    <ul className="mt-2">
-                      {solution.symptoms.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {solution?.organic_treatment &&
-                  Array.isArray(solution.organic_treatment) && (
-                    <div className="mb-3">
-                      <b>🍃 {t.organic || BASE_TEXT.organic}:</b>
-                      <ul className="mt-2">
-                        {solution.organic_treatment.map((s, i) => (
-                          <li key={i}>{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                {solution?.chemical_treatment &&
-                  Array.isArray(solution.chemical_treatment) && (
-                    <div className="mb-3">
-                      <b>🧪 {t.chemical || BASE_TEXT.chemical}:</b>
-                      <ul className="mt-2">
-                        {solution.chemical_treatment.map((s, i) => (
-                          <li key={i}>{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                {solution?.prevention &&
-                  Array.isArray(solution.prevention) && (
-                    <div className="mb-3">
-                      <b>🛡️ {t.prevention || BASE_TEXT.prevention}:</b>
-                      <ul className="mt-2">
-                        {solution.prevention.map((s, i) => (
-                          <li key={i}>{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                {solution?.extra_tip && (
-                  <div className="alert alert-success fw-semibold">
-                    💡 <b>{t.tip || BASE_TEXT.tip}:</b> {solution.extra_tip}
-                  </div>
-                )}
-
-                {solution?.warning && (
-                  <div className="alert alert-danger fw-semibold">
-                    🚨 <b>Safety:</b> {solution.warning}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+      {/* Marquee */}
+      <div className="crop-marquee">
+        <div className="marquee-track">
+          🌿 You can upload leaf of Tomato • Potato • Orange • Blueberry • Apple • Corn • Grape • Pepper • Cherry • Peach 🌱
         </div>
+      </div>
 
-        {/* FOOTER */}
-        <div className="text-center mt-4 small text-muted">
-          Made for Farmers ❤️ | गाँव के लिए AI सहायता 🌾
-        </div>
+      <div className="text-center mt-3 small text-muted">
+        Smart Farming AI 🌱 | Made for Farmers 🇮🇳
       </div>
     </div>
   );
