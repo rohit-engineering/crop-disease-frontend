@@ -32,7 +32,7 @@ function App() {
   const [language, setLanguage] = useState("hi");
   const [translatedText, setTranslatedText] = useState({});
 
-  const BACKEND_URL = "https://crop-disease-detection-hyh4.onrender.com";
+  const BACKEND_URL = "https://crop-disease-detection-hyh4.onrender.com/predict";
 
 
   const LANGUAGES = [
@@ -109,6 +109,11 @@ const translateAllContent = useCallback(async () => {
       method: "POST",
       body: formData,
     });
+
+    if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Server Error ${res.status}: ${txt}`);
+     }
 
     const data = await res.json();
 
