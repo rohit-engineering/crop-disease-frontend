@@ -2,18 +2,7 @@ import { useEffect, useState ,useCallback } from "react";
 import MobileView from "./components/MobileView";
 import DesktopView from "./components/DesktopView";
 
-function App() {
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const [language, setLanguage] = useState("hi");
-  const [translatedText, setTranslatedText] = useState({});
-
-  const BACKEND_URL = "http://127.0.0.1:8000/predict";
-
-  const BASE_TEXT = {
+const BASE_TEXT = {
     title: "Crop Doctor AI",
     subtitle: "Upload leaf photo to check disease",
     upload: "Upload Leaf Photo",
@@ -34,6 +23,18 @@ function App() {
     source: "Solution Source",
   };
 
+function App() {
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [language, setLanguage] = useState("hi");
+  const [translatedText, setTranslatedText] = useState({});
+
+  const BACKEND_URL = "http://127.0.0.1:8000/predict";
+
+
   const LANGUAGES = [
     { code: "en", name: "English" },
     { code: "hi", name: "हिंदी" },
@@ -46,23 +47,23 @@ function App() {
     { code: "pa", name: "ਪੰਜਾਬੀ" },
   ];
 
-  const translateText = async (text, targetLang) => {
-    if (targetLang === "en") return text;
+  const translateText = useCallback(async (text, targetLang) => {
+  if (targetLang === "en") return text;
 
-    try {
-      const res = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-          text
-        )}&langpair=en|${targetLang}`
-      );
+  try {
+    const res = await fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+        text
+      )}&langpair=en|${targetLang}`
+    );
 
-      const data = await res.json();
-      return data.responseData.translatedText;
-    } catch (error) {
-      console.error("Translation error:", error);
-      return text;
-    }
-  };
+    const data = await res.json();
+    return data.responseData.translatedText;
+  } catch (error) {
+    console.error("Translation error:", error);
+    return text;
+  }
+}, []);
 
 const translateAllContent = useCallback(async () => {
   let newTranslations = {};
@@ -72,7 +73,7 @@ const translateAllContent = useCallback(async () => {
   }
 
   setTranslatedText(newTranslations);
-}, [language]);
+}, [language, translateText]);
 
   useEffect(() => {
   translateAllContent();
