@@ -1,5 +1,5 @@
 // components/DesktopView.jsx
-// FINAL PREMIUM DESKTOP FILE
+// LANGUAGE UPDATED VERSION
 
 import { motion } from "framer-motion";
 import {
@@ -35,14 +35,10 @@ export default function DesktopView({
 
   return (
     <div className="desktop-pro-bg">
-
-      {/* PREMIUM HEADER */}
+      {/* HEADER */}
       <div className="desk-navbar premium-header">
-
         <div className="container-fluid px-5">
-
           <div className="row align-items-center">
-
             <div className="col-lg-8">
               <h1 className="desk-logo premium-title">
                 <FaLeaf className="me-2" />
@@ -51,15 +47,14 @@ export default function DesktopView({
 
               <p className="premium-tagline">
                 <FaRobot className="me-2" />
-                Smart AI Powered Crop Disease Detection
+                {t.subtitle || BASE_TEXT.subtitle}
               </p>
             </div>
 
             <div className="col-lg-4 text-end">
-
               <label className="premium-label">
                 <FaGlobeAsia className="me-2" />
-                Select Language
+                Language
               </label>
 
               <select
@@ -73,31 +68,26 @@ export default function DesktopView({
                   </option>
                 ))}
               </select>
-
             </div>
-
           </div>
         </div>
       </div>
 
       {/* BODY */}
       <div className="container-fluid px-5 py-4">
-
         <div className="row g-4">
 
-          {/* LEFT SIDE */}
+          {/* LEFT */}
           <div className="col-lg-4">
-
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               className="desk-box sticky-top"
               style={{ top: "25px" }}
             >
-
               <h3 className="desk-section-title">
                 <FaUpload className="me-2" />
-                Upload Crop Leaf
+                {t.upload || BASE_TEXT.upload}
               </h3>
 
               <img
@@ -108,7 +98,7 @@ export default function DesktopView({
 
               <label className="desk-upload-btn">
                 <FaUpload className="me-2" />
-                Upload Leaf Photo
+                {t.upload || BASE_TEXT.upload}
 
                 <input
                   hidden
@@ -134,40 +124,38 @@ export default function DesktopView({
                 {loading ? (
                   <>
                     <span className="loader me-2"></span>
-                    Scanning...
+                    {t.analyzing || BASE_TEXT.analyzing}
                   </>
                 ) : (
                   <>
                     <FaSearch className="me-2" />
-                    Check Disease
+                    {t.predict || BASE_TEXT.predict}
                   </>
                 )}
               </button>
 
               <p className="small text-muted mt-4 mb-0">
-                Best result ke liye clear leaf image upload karein.
+                {t.selectLeaf || BASE_TEXT.selectLeaf}
               </p>
-
             </motion.div>
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT */}
           <div className="col-lg-8">
-
             {!result ? (
               <div className="desk-box text-center p-5">
                 <h3 className="text-success fw-bold">
                   <FaCheckCircle className="me-2" />
-                  Detection Result
+                  {t.resultTitle || BASE_TEXT.resultTitle}
                 </h3>
 
                 <p className="text-muted mt-4">
-                  Upload crop image to detect disease
+                  {t.noResult || BASE_TEXT.noResult}
                 </p>
               </div>
             ) : (
               <>
-                {/* TOP RESULT */}
+                {/* TOP */}
                 <div className="row g-4 mb-4">
 
                   <div className="col-md-6">
@@ -178,7 +166,7 @@ export default function DesktopView({
                     >
                       <h5>
                         <FaBug className="me-2" />
-                        Disease Found
+                        {t.disease || BASE_TEXT.disease}
                       </h5>
 
                       <h3 className="mt-3 text-success">
@@ -194,7 +182,7 @@ export default function DesktopView({
                       transition={{ delay: 0.2 }}
                       className="desk-box confidence-big"
                     >
-                      <h5>Confidence Score</h5>
+                      <h5>{t.confidence || BASE_TEXT.confidence}</h5>
 
                       <div className="progress mt-4">
                         <div
@@ -209,7 +197,7 @@ export default function DesktopView({
 
                 </div>
 
-                {/* CAUSE */}
+                {/* GUIDE */}
                 <motion.div
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -218,7 +206,7 @@ export default function DesktopView({
                 >
                   <h3 className="desk-section-title">
                     <FaSeedling className="me-2" />
-                    Treatment Guide
+                    {t.solution || BASE_TEXT.solution}
                   </h3>
 
                   {solution?.cause && (
@@ -228,10 +216,9 @@ export default function DesktopView({
                   )}
                 </motion.div>
 
-                {/* GRID CARDS */}
+                {/* CARDS */}
                 <div className="row g-4">
 
-                  {/* Symptoms */}
                   <div className="col-md-6">
                     <motion.div
                       initial={{ opacity: 0, y: 35 }}
@@ -239,7 +226,7 @@ export default function DesktopView({
                       transition={{ delay: 0.4 }}
                       className="desk-box small-box"
                     >
-                      <h5>Symptoms</h5>
+                      <h5>{t.symptoms || BASE_TEXT.symptoms}</h5>
 
                       <ul>
                         {solution?.symptoms?.map((item, i) => (
@@ -249,7 +236,6 @@ export default function DesktopView({
                     </motion.div>
                   </div>
 
-                  {/* Organic */}
                   <div className="col-md-6">
                     <motion.div
                       initial={{ opacity: 0, y: 35 }}
@@ -259,7 +245,7 @@ export default function DesktopView({
                     >
                       <h5>
                         <FaLeaf className="me-2" />
-                        Organic Treatment
+                        {t.organic || BASE_TEXT.organic}
                       </h5>
 
                       <ul>
@@ -270,7 +256,6 @@ export default function DesktopView({
                     </motion.div>
                   </div>
 
-                  {/* Chemical */}
                   <div className="col-md-6">
                     <motion.div
                       initial={{ opacity: 0, y: 35 }}
@@ -280,7 +265,7 @@ export default function DesktopView({
                     >
                       <h5>
                         <FaFlask className="me-2" />
-                        Chemical Treatment
+                        {t.chemical || BASE_TEXT.chemical}
                       </h5>
 
                       <ul>
@@ -291,7 +276,6 @@ export default function DesktopView({
                     </motion.div>
                   </div>
 
-                  {/* Prevention */}
                   <div className="col-md-6">
                     <motion.div
                       initial={{ opacity: 0, y: 35 }}
@@ -301,7 +285,7 @@ export default function DesktopView({
                     >
                       <h5>
                         <FaShieldAlt className="me-2" />
-                        Prevention
+                        {t.prevention || BASE_TEXT.prevention}
                       </h5>
 
                       <ul>
@@ -319,8 +303,8 @@ export default function DesktopView({
             <div className="text-center mt-4 small text-muted">
               Made for Farmers 🇮🇳 | Smart Farming Future 🌱
             </div>
-
           </div>
+
         </div>
       </div>
     </div>

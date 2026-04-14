@@ -1,5 +1,5 @@
 // components/MobileView.jsx
-// FINAL COMPLETE MOBILE FILE
+// LANGUAGE UPDATED VERSION
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -43,24 +43,24 @@ export default function MobileView({
     const data = result.solution || {};
 
     const messages = [
-      "Disease analyzed successfully ✅",
+      `✅ ${t.resultTitle || BASE_TEXT.resultTitle}`,
       `Cause: ${data.cause || "Crop infection detected."}`,
-      `Symptoms: ${
+      `${t.symptoms || BASE_TEXT.symptoms}: ${
         data.symptoms?.length
           ? data.symptoms.join(", ")
           : "Leaf damage symptoms found."
       }`,
-      `Organic Treatment: ${
+      `${t.organic || BASE_TEXT.organic}: ${
         data.organic_treatment?.length
           ? data.organic_treatment.join(", ")
           : "Use neem spray weekly."
       }`,
-      `Chemical Treatment: ${
+      `${t.chemical || BASE_TEXT.chemical}: ${
         data.chemical_treatment?.length
           ? data.chemical_treatment.join(", ")
           : "Use recommended fungicide."
       }`,
-      `Prevention: ${
+      `${t.prevention || BASE_TEXT.prevention}: ${
         data.prevention?.length
           ? data.prevention.join(", ")
           : "Avoid excess moisture and keep field clean."
@@ -96,7 +96,7 @@ export default function MobileView({
     };
 
     typeMessage();
-  }, [result]);
+  }, [result, t, BASE_TEXT]);
 
   const confidenceWidth = result?.confidence
     ? `${(result.confidence * 100).toFixed(0)}%`
@@ -117,7 +117,7 @@ export default function MobileView({
         </h3>
 
         <p className="mb-3">
-          Smart Crop Disease Detection
+          {t.subtitle || BASE_TEXT.subtitle}
         </p>
 
         {!loading && !result && (
@@ -135,7 +135,7 @@ export default function MobileView({
         )}
       </motion.div>
 
-      {/* START SCREEN */}
+      {/* START */}
       {!preview && !loading && !result && (
         <motion.div
           initial={{ opacity: 0, y: 25 }}
@@ -143,7 +143,7 @@ export default function MobileView({
           className="glass-card"
         >
           <h5 className="text-center fw-bold mb-3 text-success">
-            Upload Crop Leaf
+            {t.upload || BASE_TEXT.upload}
           </h5>
 
           <img
@@ -154,7 +154,7 @@ export default function MobileView({
 
           <label className="ultra-btn mb-3">
             <FaCamera className="me-2" />
-            Capture Image
+            Camera
 
             <input
               hidden
@@ -167,7 +167,7 @@ export default function MobileView({
 
           <label className="ultra-btn secondary">
             <FaUpload className="me-2" />
-            Upload Image
+            {t.upload || BASE_TEXT.upload}
 
             <input
               hidden
@@ -196,7 +196,7 @@ export default function MobileView({
             className="scan-btn mt-3"
             onClick={handleSubmit}
           >
-            Scan Disease
+            {t.predict || BASE_TEXT.predict}
           </button>
         </motion.div>
       )}
@@ -207,11 +207,11 @@ export default function MobileView({
           <div className="loader-big mb-4"></div>
 
           <h5 className="fw-bold text-success">
-            Scanning Your Image...
+            {t.analyzing || BASE_TEXT.analyzing}
           </h5>
 
           <p className="typing-title">
-            Detecting disease with AI...
+            AI Processing...
           </p>
         </div>
       )}
@@ -225,11 +225,11 @@ export default function MobileView({
         >
           <h5 className="text-success text-center fw-bold">
             <FaCheckCircle className="me-2" />
-            Analysis Complete
+            {t.resultTitle || BASE_TEXT.resultTitle}
           </h5>
 
           <p className="text-center small text-muted mb-3">
-            Your crop report is ready 🌱
+            🌱 Report Ready
           </p>
 
           {/* Disease */}
@@ -238,7 +238,8 @@ export default function MobileView({
             animate={{ opacity: 1, y: 0 }}
             className="result-box disease-card"
           >
-            <small>Disease Detected</small>
+            <small>{t.disease || BASE_TEXT.disease}</small>
+
             <h6 className="disease-text">
               🌿 {result.prediction}
             </h6>
@@ -251,7 +252,7 @@ export default function MobileView({
             transition={{ delay: 0.2 }}
             className="result-box confidence-card"
           >
-            <small>AI Confidence Score</small>
+            <small>{t.confidence || BASE_TEXT.confidence}</small>
 
             <div className="progress mt-3">
               <div
@@ -263,11 +264,10 @@ export default function MobileView({
             </div>
           </motion.div>
 
-          {/* AI Chat */}
+          {/* CHAT */}
           <div className="solution-box mt-3">
-
             <h6 className="fw-bold text-success mb-3">
-              🤖 AI Treatment Assistant
+              🤖 {t.solution || BASE_TEXT.solution}
             </h6>
 
             <div className="chat-thread">
@@ -275,17 +275,13 @@ export default function MobileView({
               {chatMessages.map((msg, i) => (
                 <div key={i} className="chat-msg">
                   <div className="chat-avatar">🤖</div>
-
-                  <div className="chat-bubble">
-                    {msg}
-                  </div>
+                  <div className="chat-bubble">{msg}</div>
                 </div>
               ))}
 
               {typingText && (
                 <div className="chat-msg">
                   <div className="chat-avatar">🤖</div>
-
                   <div className="chat-bubble">
                     {typingText}
                     <span className="cursor-blink">|</span>
@@ -296,7 +292,7 @@ export default function MobileView({
             </div>
           </div>
 
-          {/* Back Button */}
+          {/* BACK */}
           <button
             className="back-btn mt-4"
             onClick={() => window.location.reload()}
@@ -307,15 +303,15 @@ export default function MobileView({
         </motion.div>
       )}
 
-      {/* Marquee */}
+      {/* FOOTER */}
       <div className="crop-marquee">
         <div className="marquee-track">
-          🌿 You can upload leaf of Tomato • Potato • Orange • Blueberry • Apple • Corn • Grape • Pepper • Cherry • Peach 🌱
+          🌿 Tomato • Potato • Orange • Apple • Corn • Grape • Pepper • Cherry 🌱
         </div>
       </div>
 
       <div className="text-center mt-3 small text-muted">
-        Smart Farming AI 🌱 | Made for Farmers 🇮🇳
+        Smart Farming AI 🌱
       </div>
     </div>
   );

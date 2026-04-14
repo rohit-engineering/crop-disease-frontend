@@ -1,30 +1,10 @@
 // App.jsx
 
 import "./styles/app.css";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import MobileView from "./components/MobileView";
 import DesktopView from "./components/DesktopView";
-
-const BASE_TEXT = {
-  title: "Crop Doctor AI",
-  subtitle: "AI Powered Crop Disease Detection",
-  upload: "Upload Leaf Photo",
-  predict: "Check Disease",
-  analyzing: "Scanning Crop...",
-  selectLeaf: "Please select a leaf image",
-  resultTitle: "Detection Result",
-  noResult: "Upload image to view prediction",
-  disease: "Disease",
-  confidence: "Confidence",
-  warning: "Warning",
-  solution: "Solution",
-  symptoms: "Symptoms",
-  organic: "Organic Treatment",
-  chemical: "Chemical Treatment",
-  prevention: "Prevention",
-  tip: "Extra Tip",
-  source: "Solution Source",
-};
+import translations from "./translations/uiText.json";
 
 function App() {
   const [image, setImage] = useState(null);
@@ -33,9 +13,8 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const [language, setLanguage] = useState("hi");
-  const [translatedText, setTranslatedText] = useState({});
 
-  const BACKEND_URL = "https://crop-disease-detection-hyh4.onrender.com/predict";
+  const BACKEND_URL = "http://127.0.0.1:8000/predict";
 
   const LANGUAGES = [
     { code: "en", name: "English" },
@@ -46,41 +25,12 @@ function App() {
     { code: "te", name: "తెలుగు" },
     { code: "gu", name: "ગુજરાતી" },
     { code: "kn", name: "ಕನ್ನಡ" },
-    { code: "pa", name: "ਪੰਜਾਬੀ" },
+    { code: "pa", name: "ਪੰਜਾਬੀ" }
   ];
 
-  const translateText = useCallback(async (text, targetLang) => {
-    if (targetLang === "en") return text;
-
-    try {
-      const res = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-          text
-        )}&langpair=en|${targetLang}`
-      );
-
-      const data = await res.json();
-      return data.responseData.translatedText;
-    } catch {
-      return text;
-    }
-  }, []);
-
-  const translateAllContent = useCallback(async () => {
-    let newTranslations = {};
-
-    for (let key in BASE_TEXT) {
-      newTranslations[key] = await translateText(BASE_TEXT[key], language);
-    }
-
-    setTranslatedText(newTranslations);
-  }, [language, translateText]);
-
-  useEffect(() => {
-    translateAllContent();
-  }, [translateAllContent]);
-
-  const t = language === "en" ? BASE_TEXT : translatedText;
+  // Current language text
+  const t = translations[language] || translations.en;
+  const BASE_TEXT = translations.en;
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -97,7 +47,7 @@ function App() {
   };
 
   const handleSubmit = async () => {
-    if (!image) return alert(t.selectLeaf || BASE_TEXT.selectLeaf);
+    if (!image) return alert(t.selectLeaf);
 
     const formData = new FormData();
     formData.append("file", image);
