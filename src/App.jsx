@@ -14,7 +14,7 @@ function App() {
 
   const [language, setLanguage] = useState("hi");
 
-  const BACKEND_URL = "http://127.0.0.1:8000/predict";
+  const BACKEND_URL = "https://crop-disease-detection-hyh4.onrender.com/predict";
 
   const LANGUAGES = [
     { code: "en", name: "English" },
